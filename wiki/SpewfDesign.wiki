@@ -29,3 +29,56 @@ Erlang OTP design principles give us the notion of modules implementing standard
 ==Erlang is Cool==
 
 Erlang is a good programming language with a robust and richly-featured runtime system. Interoperability (with database or other backends) is a general application development issue and not the responsibility of the web framework. The assumption behind SPEWF (if there is one) is that you will store your data in Mnesia. To that end, it might gain features like using Mnesia record shapes for communicating with applications, but no tighter coupling would be contemplated.
+
+=Future Ideas=
+
+It would be nice to be tighter about the "reply language" (which right now is an *ehtml* tuple, a la yaws, postprocessed) so that SPEWF can more easily insert the spid (session process id); and so that more HTML can be generated. It would be nice to do something like:
+
+{{{
+   handle([], R) ->
+      {spewf, {prompt, [], said}};
+   .
+   .
+   .
+}}}
+
+...and have SPEWF transform that into:
+
+{{{
+   {ehtml, {form, [{action, self}], [
+      {input, [{type, "text"}, {name, "said"}], []}
+      {input, [{type, "hidden"}, {name, 
+      ]}}
+}}}
+
+
+Another thing would be to have a more efficient (in terms of expression) way of communicating the request to the session. Right now it's a keylist (it could be some other mapping implementation). It might be nice to have them be records defined by the callback module or something. So the request data is tuplified and sent that way.
+
+Instead of:
+
+{{{
+   handle(S, R) ->
+      case lists:keysearch(age, 1, R) of
+         {value, {age, Age}} -> {S#said{age = Age}, {html, "ok"}};
+         false ->
+            case lists:keysearch(birthyear, 1, R) of
+               {value, {birthyear, Value}} ->
+                  {S#myapp{age = (?currentyear - list_to_integer(Value))}, {html, "ok"}};
+      .
+      .
+      .
+}}}
+
+...you could have something more like:
+
+{{{
+   handle(S, #myapp{age = null, birthyear = Birthyear}) ->
+      {S#myapp{age = (?currentyear - list_to_integer(Birthyear))}, {html, "ok"}};
+   handle(S, #myapp{age = Age}) ->
+      {S#myapp{age = Age}, {html, "ok"}};
+   .
+   .
+   .
+}}}
+
+...which seems more concise and Erlang-y to me.
