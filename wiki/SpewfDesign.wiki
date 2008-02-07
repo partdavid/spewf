@@ -40,23 +40,23 @@ It would be nice to be tighter about the "reply language" (which right now is an
 
 {{{
    handle([], R) ->
-      {spewf, {prompt, [], said}};
+      {[], {spewf, {prompt, [], said}}};
    .
    .
    .
 }}}
 
-...and have SPEWF transform that into:
+...and have SPEWF transform the second element into:
 
 {{{
    {ehtml, {form, [{action, self}], [
       {input, [{type, "text"}, {name, "said"}], []}
-      {input, [{type, "hidden"}, {name, 
+      {input, [{type, "hidden"}, {spid, Spid}], []}
       ]}}
 }}}
 
 
-Another thing would be to have a more efficient (in terms of expression) way of communicating the request to the session. Right now it's a keylist (it could be some other mapping implementation). It might be nice to have them be records defined by the callback module or something. So the request data is tuplified and sent that way.
+Another thing would be to have a more efficient (in terms of expression) way of communicating the request to the session. Right now it's a keylist (it could be some other mapping implementation, but my thought is that individual requests are small). It might be nice to have them be records defined by the callback module or something. So the request data is tuplified and sent that way.
 
 Instead of:
 
