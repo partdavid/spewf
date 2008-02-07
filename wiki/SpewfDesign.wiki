@@ -1,0 +1,31 @@
+#summary Thoughts about design and future direction of SPEWF
+
+=What about other frameworks?=
+
+It seems like ErlyWeb is a really good web framework for Erlang, and follows the nice Model-View-Controller separation of Rails and Rails-inspired frameworks. I understand there will soon be an Mnesia driver for it (from ErlyDB).
+
+My point was not to write another framework that duplicates the efforts of more mature ones, but to provide something with some more power than "default Erlang", in an Erlang-y way; that is, without particularly following the model of other frameworks (generate code) etc.
+
+=Concepts=
+
+==Sessions are Processes==
+
+The "traditional" way to keep sessions are in some kind of memory object in the language runtime system (e.g. continuations in Arc, PLT Scheme, Seaside, beans in J2EE application servers) or in a session server of some kind (a database, memcached, perhaps shared).
+
+The disadvantages of the former are that an application scales only to a single computer. Once you have enough traffic that that becomes problematic, you now face a new problem, which means you need to start doing sessions in an entirely different way.
+
+The second method is only a little better. It's better because the resource that is serving session information can be dedicated to that task. But it is still a potential bottleneck, either as a single point of failure or as a limiting resource.
+
+Erlang processes as sessions have a number of advantages:
+
+  * Scalability. A distributed Erlang system can have any number of nodes in it, each with thousands of processes executing user sessions. Since the SPEWF session id is just a process id, no dictionary or central store of session data is required--it just sends the request to the right process and sends the result back to the client.
+  * Elegance. A web application never needs to worry about statefulness or concurrency. It can be written in the same way as an event-driven desktop application. Any method the programmer might want to use to preserve state (a looping function, a table, a database, whatever) can be used in a straightforward manner just as with any Erlang application.
+  * Robustness. Since Erlang has online code upgrades, the user session can remain alive even as the application code it's executing is upgraded.
+
+==Callbacks==
+
+Erlang OTP design principles give us the notion of modules implementing standard behaviors by implementing callback functions. Although the first sketch of SPEWF combines this (so that SPEWF applications only implement the one callback), eventually there will probably be two concepts: the SPEWF handler, which is a sort of protocol adapter converting HTTP conversations into Erlang messages; and the generic session, a sort of generic server that listens to and replies to Erlang messages.
+
+==Erlang is Cool==
+
+Erlang is a good programming language with a robust and richly-featured runtime system. Interoperability (with database or other backends) is a general application development issue and not the responsibility of the web framework. The assumption behind SPEWF (if there is one) is that you will store your data in Mnesia. To that end, it might gain features like using Mnesia record shapes for communicating with applications, but no tighter coupling would be contemplated.
