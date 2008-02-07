@@ -1,5 +1,5 @@
 %%
-%% "said" module by Jeremy Brinkley.
+%% "said" module by partdavid@gmail.com
 %% Implements the arc challenge - http://www.paulgraham.com/arcchallenge.html
 %%
 
