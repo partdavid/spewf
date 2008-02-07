@@ -44,7 +44,7 @@ See the example web application *said* for an example of using SPEWF.
 Status
 ======
 
-This describes version 0.1.0, which is just a sketch of a few ideas. See
+This describes version 0.1.1, which is just a sketch of a few ideas. See
 TODO, below, for ideas for future directions.
 
 TODO
