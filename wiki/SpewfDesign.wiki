@@ -32,6 +32,8 @@ Erlang is a good programming language with a robust and richly-featured runtime 
 
 Parse transforms are neat, and if there's a way to write the web application more concisely using transformations, that would be good. However, in my opinion code generation is a no-no.
 
+Similarly, I'm not fond of template-based frameworks. HTML is something you should generate, not write (I'm with Seaside et al. on this one). Smart "templates" should take the form of an Erlang term structure, not text files.
+
 =Future Ideas=
 
 It would be nice to be tighter about the "reply language" (which right now is an *ehtml* tuple, a la yaws, postprocessed) so that SPEWF can more easily insert the spid (session process id); and so that more HTML can be generated. It would be nice to do something like:
