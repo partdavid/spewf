@@ -22,7 +22,7 @@
 
 -module(spewf).
 -author('partdavid@gmail.com').
--vsn({0, 1, 0}).
+-vsn({0, 1, 1}).
 -export([val/2, out/1, handle/2]).
 
 -include_lib("yaws_api.hrl").
