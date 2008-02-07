@@ -2,7 +2,7 @@
 
 =What about other frameworks?=
 
-It seems like ErlyWeb is a really good web framework for Erlang, and follows the nice Model-View-Controller separation of Rails and Rails-inspired frameworks. I understand there will soon be an Mnesia driver for it (from ErlyDB).
+It seems like [http://erlyweb.org/ ErlyWeb] is a really good web framework for Erlang, and follows the nice Model-View-Controller separation of Rails and Rails-inspired frameworks. I understand there will soon be an Mnesia driver for it (from !ErlyDB).
 
 My point was not to write another framework that duplicates the efforts of more mature ones, but to provide something with some more power than "default Erlang", in an Erlang-y way; that is, without particularly following the model of other frameworks (generate code) etc.
 
@@ -29,6 +29,8 @@ Erlang OTP design principles give us the notion of modules implementing standard
 ==Erlang is Cool==
 
 Erlang is a good programming language with a robust and richly-featured runtime system. Interoperability (with database or other backends) is a general application development issue and not the responsibility of the web framework. The assumption behind SPEWF (if there is one) is that you will store your data in Mnesia. To that end, it might gain features like using Mnesia record shapes for communicating with applications, but no tighter coupling would be contemplated.
+
+Parse transforms are neat, and if there's a way to write the web application more concisely using transformations, that would be good. However, in my opinion code generation is a no-no.
 
 =Future Ideas=
 
