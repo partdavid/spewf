@@ -28,58 +28,56 @@
 -include_lib("yaws_api.hrl").
 
 val(L, K) ->
-	 lists:keysearch(K, 1, L).
+   lists:keysearch(K, 1, L).
 
 new_session(Mod) ->
-	 spawn(?MODULE, handle, [Mod, []]).
+   spawn(?MODULE, handle, [Mod, []]).
 
 handle(M, S) ->
-	 receive
-		  {From, {request, Req}} ->
-				{NewS, Reply} = apply(M, handle, [S, Req]),
-				From ! {self(), Reply},
-				?MODULE:handle(M, NewS);
-		  {_From, 'EXIT'} -> exit
-	 after 900000 ->
-				timeout
-	 end.
+   receive
+      {From, {request, Req}} ->
+         {NewS, Reply} = apply(M, handle, [S, Req]),
+         From ! {self(), Reply},
+         ?MODULE:handle(M, NewS);
+      {_From, 'EXIT'} -> exit
+   after 900000 ->
+         timeout
+   end.
 
 make_mod(Data) ->
-	 [Mod|_] = string:tokens(Data, "/"),
-	 list_to_atom(Mod).
+   [Mod|_] = string:tokens(Data, "/"),
+   list_to_atom(Mod).
 
-%% TODO This is quite limited at the moment, only 'self' is supported,
-%% but one needs various ways of including or transforming that part of
-%% the URL. Also, there should be some way of indicating that you want
-%% the session in a hidden field or something similar. -partdavid
 add_session(A, Spid, {ehtml, Terms}) ->
-	 {ehtml, add_session(A, Spid, Terms)};
+   {ehtml, add_session(A, Spid, Terms)};
 add_session(A, Spid, [T|Terms]) ->
-	 [add_session(A, Spid, T)|add_session(A, Spid, Terms)];
+   [add_session(A, Spid, T)|add_session(A, Spid, Terms)];
 add_session(A, Spid, {El, Params, Content}) ->
-	 {El, add_session(A, Spid, Params), add_session(A, Spid, Content)};
+   {El, add_session(A, Spid, Params), add_session(A, Spid, Content)};
 add_session(_A, Spid, {Thing, self}) ->
-	 {Thing, io_lib:format("?spid=~s", [pid_to_list(Spid)])};
+   {Thing, io_lib:format("?spid=~s", [pid_to_list(Spid)])};
 add_session(_A, _Spid, Any) ->
-	 Any.
+   Any.
 
 out(A) ->
-	 R = [ {list_to_atom(K), V} || {K, V} <- yaws_api:parse_query(A) ],
-	 Spid = case val(R, spid) of
-					{value, {spid, V}} ->
-						 Pid = list_to_pid(V),
-						 case is_process_alive(Pid) of
-							  true -> Pid;
-							  false -> new_session(make_mod(A#arg.appmoddata))
-						 end;
-					false -> new_session(make_mod(A#arg.appmoddata))
-			  end,
-	 Spid ! {self(), {request, R}},
-	 receive
-		  {Spid, Reply} ->
-				 add_session(A, Spid, Reply)
-	 after 5000 ->
-				{ehtml, {p, [{style, "color: red"}],
-							io_lib:format("Error from module ~s (timeout after 5s) session ~s",
-											  [make_mod(A#arg.appmoddata), pid_to_list(Spid)])}}
-	 end.
+   R = [ {list_to_atom(K), V} || {K, V} <- yaws_api:parse_query(A) ],
+   Spid = case val(R, spid) of
+             {value, {spid, V}} ->
+                Pid = list_to_pid(V),
+                case is_process_alive(Pid) of
+                   true -> Pid;
+                   false -> new_session(make_mod(A#arg.appmoddata))
+                end;
+             false -> new_session(make_mod(A#arg.appmoddata))
+          end,
+   Spid ! {self(), {request, R}},
+   receive
+      {Spid, Reply} ->
+         add_session(A, Spid, Reply)
+   after 5000 ->
+         {ehtml, {p, [{style, "color: red"}],
+                  io_lib:format("Error from module ~s (timeout after 5s)"
+                                "session ~s",
+                                [make_mod(A#arg.appmoddata),
+                                 pid_to_list(Spid)])}}
+   end.
