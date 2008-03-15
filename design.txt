@@ -1,0 +1,80 @@
+When the spewf application is started, it starts two supervision trees, the
+server tree (session manager) and dispatch tree (sessions).
+
+You can conceptualize the spewf nodes in an Erlang distributed system (which,
+for buzzword purposes, I will call a "grid") as "web" servers and
+"application" servers, though the only difference between them is the kind
+of requests you throw at them, and (possibly) their local configurations.
+
+One of the goals of spewf is that you don't have to do anything strange
+at the load balancing layer to enable your sessions--any web server can
+find any app server, and having lots of either doesn't slow the process
+down.
+
+Another goal is to keep applications conceptually simple: a process
+corresponds to a user session, so you can program as if you are talking
+to only one user within the process in an event-based way. In addition
+to simple being good in itself, this will hopefull decouple all the web
+business from your application logic, making it easy to test.
+
+When a web server receives a web request (through yaws; that is, when
+spewf_appmod is invoked), it examines the request to see if there's a session
+Id. A session Id is simply a short encrypted erlang term. The term is
+this:
+
+{Node, Id}
+
+Node is an atom, Id is a reference.
+
+If there is a session Id, spewf_appmod sends the request to the Node's
+dispatcher (the local one if Node is node()). If this request times out
+(this is the "quick timeout") it's assumed that the session is over and
+spewf_appmod requests a new session; this is also what happens if spewf_appmod
+finds no session Id in the request.
+
+In that case, spewf_appmod asks the local session manager where the next
+new session should go. The session manager might store a round-robin list
+of "app server" nodes; it might keep the internal default of "all local
+sessions" or it might evaluate a fun to find the next location. It returns
+a descriptor like this:
+
+local | Node::atom()
+
+spewf_appmod sends the request to the named dispatcher (either
+spewf_dispatcher or {spewf_dispatcher, Node} and waits for a reply.
+It looks something like:
+
+spewf_dispatcher:request(Dispatcher, new, InitRequest)
+
+The dispatcher receives the request for the new session and generates a
+reference to identify it. It tells its (dispatch tree) supervisor to
+create a new 'transient' child, with the supplied InitRequest. It stores
+the child pid in a lookup (ets) table. The child also knows its session Id.
+The dispatcher adds the requesting Pid to the InitRequest. (InitRequest is
+just like a gen_server call.
+
+The child handles the initial request and returns a reply directly to the
+requesting process (the reply does not go through the dispatcher.
+
+When spewf_appmod finds a session Id, it calls the appropriate dispatcher:
+
+spewf_dispatcher:request(Dispatcher, Ref, Request)
+
+The dispatcher looks up the ref in its ets table and finds the (local) pid.
+It forwards the request along with the requesting Pid to the session as a
+cast.
+
+The session is responsible for applying its idle timeout or total lifetime.
+The session is a gen_server doing things like:
+
+handle_cast({request, From, Spid, WebRequest}, State) ->
+   Answer = process_things(WebRequest),
+   From ! {Spid, Answer},
+   {noreply, State}.
+
+It would be nice for the webapp callback module to just have to do:
+
+handle_request(R, State) ->
+                  {
+
+In fact I think I'll do that.
