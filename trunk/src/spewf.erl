@@ -9,7 +9,11 @@ val(L, K) ->
 	 lists:keysearch(K, 1, L).
 
 %% TODO: configure
--define(sidkey, <<13,82,40,33,229,92,212,241,191,224,194,152,177,236,14,153>>).
+%% The "hardcoded" sidkey is set at build time--if you are testing, or
+%% running without a proper application config file, this can be okay. Oh,
+%% this is a string because the preprocessor seems to choke on binaries
+%% as the value of a macro in c() or on the erlc command line. -pd
+%% -define(sidkey, "0rJnw5xro3n+q7l87lDtBg==").
 -define(error_page(Err), {ehtml,
                           [
                            {head, [],
@@ -58,14 +62,20 @@ add_session(_A, _Spid, Any) ->
 sid2pid(Sid) when is_list(Sid) ->
    sid2pid(base64:decode(urlunsafe(Sid)));
 sid2pid(<<IVec:16/binary, Sid/binary>>) ->
-   PidB = crypto:aes_cfb_128_decrypt(?sidkey, IVec, Sid),
+   PidB = crypto:aes_cfb_128_decrypt(sidkey(), IVec, Sid),
    binary_to_term(PidB).
+
+sidkey() ->
+   case application:get_env(spewf, sidkey) of
+      undefined -> base64:decode(?sidkey);
+      Key -> Key
+   end.
 
 pid2sid(Pid) ->
    IVec = crypto:md5(lists:reverse(lists:flatten(
                                      [ integer_to_list(N) ||
                                         N <- tuple_to_list(now()) ]))),
-   EPid = crypto:aes_cfb_128_encrypt(?sidkey, IVec, term_to_binary(Pid)),
+   EPid = crypto:aes_cfb_128_encrypt(sidkey(), IVec, term_to_binary(Pid)),
    urlsafe(base64:encode_to_string(<<IVec/binary, EPid/binary>>)).
 
 urlunsafe(L) when length(L) rem 4 > 0 ->

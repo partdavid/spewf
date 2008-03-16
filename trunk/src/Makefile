@@ -47,6 +47,12 @@ TARGET_FILES= $(BEAMS) $(APP_TARGET) $(APPUP_TARGET)
 
 WEB_TARGET=/var/yaws/www/$(APP_NAME)
 
+# Random key - it's okay for this to be a different value for every
+# beam, because it only actually applies to spewf.erl. It's easier
+# to do this to the flags than to make a rule for spewf.erl.
+SPEWF_KEY=`$(ERL) -noshell -run crypto start -eval 'io:format("~s~n", [base64:encode_to_string(crypto:rand_bytes(16))]).' -run init stop`
+ERLC_FLAGS += -Dsidkey="\"$(SPEWF_KEY)\""
+
 # ----------------------------------------------------
 # FLAGS
 # ----------------------------------------------------
