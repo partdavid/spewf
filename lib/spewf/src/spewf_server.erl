@@ -1,11 +1,30 @@
+%%
+%% Copyright 2008 partdavid at gmail.com
+%%
+%% This file is part of SPEWF.
+%%
+%% SPEWF is free software: you can redistribute it and/or modify it under the
+%% terms of the GNU Lesser General Public License as published by the Free
+%% Software Foundation, either version 3 of the License, or (at your option)
+%% any later version.
+%%
+%% SPEWF is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+%% FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+%% more details.
+%%
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
+%%
+-module(spewf_server).
 %% @doc This server is the "session manager". It handles the round-robin
 %% handing out of session specifications, which are incomplete child
 %% specifications. In its simplest form, 
--module(spewf_server).
 -behaviour(gen_server).
 
 -include_lib("eunit/include/eunit.hrl").
 
+%% API
 -export([start_link/0, start_shell/0,
          stop/0]).
 
@@ -23,38 +42,90 @@
 
 -define(SERVER, ?MODULE).
 
-%% @doc Starts the server.
-%% @spec start_link() -> {ok, pid()} | {error, Reason}
-%% @end
+%% @spec start_link() -> {ok, pid()} + {error, Reason}
+%%    Reason = term()
+%% @doc Starts the session management server.
 start_link() ->
    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
+%% @spec start_shell() -> {ok, pid()} + {error, Reason}
+%%    Reason = term()
+%% @doc Starts the session management server, without linking.
 start_shell() ->
    {ok, Pid} = start_link(),
    unlink(Pid),
    {ok, Pid}.
-   
 
-%%--------------------------------------------------------------------
-%% @doc Stops the server.
-%% @spe1 stop() -> ok
-%% @end
-%%--------------------------------------------------------------------
+%% @spec stop() -> ok
+%% @doc Stops the session management server.
 stop() ->
     gen_server:cast(?SERVER, stop).
 
+%% @spec next(Module::atom()) -> Node
+%%    Node = local + atom()
+%% @doc Gets the node at which the next session for the given subapp module
+%% should be created.
 next(Mod) ->
    gen_server:call(?SERVER, {next, Mod}).
 
+%% @spec register_subapp(Module, DispatcherList) ->
+%%    {registered, Module} + {error, Reason}
+%%    Module = atom()
+%%    Reason = term()
+%%    DispatcherList = [Dispatcher]
+%%    Dispatcher = Node + function()
+%%    Node = atom()
+%% @doc Register the subapp given by module with the initial list of
+%% available dispatchers given by DispatcherList. The dispatcher list
+%% may contain nodenames or functions, as with
+%% {@link append_to_dispatcher_list/2}.
 register_subapp(Mod, DispatcherList) ->
    gen_server:call(?SERVER, {register_subapp, Mod, DispatcherList}).
 
+%% @spec unregister_subapp(Module::atom()) -> ok + {error, Reason}
+%%    Reason = term()
+%% @doc Remove the subapp from the session manager. Any further requests
+%% via {@link next/1} for the subapp will use the ``spewf'' built-in
+%% default.
 unregister_subapp(Mod) ->
    gen_server:call(?SERVER, {unregister_subapp, Mod}).
 
+%% @spec append_to_dispatcher_list(Module::atom(), Dispatcher) ->
+%%    ok + {error, Reason}
+%%    Reason = term()
+%%    Dispatcher = Node + function()
+%%    Node = atom()
+%% @doc Appends the dispatcher specification to the end of the dispatcher
+%% list for the given subapp. The dispatcher specification may be
+%% a nodename or a fun. If a nodename, then that nodename is returned
+%% for {@link next/1} calls that occur when that element is at the head
+%% of the dispatcher list.
+%%
+%% When the element at the head of the dispatcher list is a fun of
+%% arity 0, that fun is evaluated and expected to provide a nodename,
+%% which is returned as the value of {@link next/1}. When the element
+%% at the head of the dispatcher list is a fun of arity 1, the fun
+%% is passed the last return value of {@link next/1} and the value it
+%% returns is returned as the value of {@link next/1}. If no nodenames
+%% have been returned, the fun receives the atom ``undefined''.
+%%
+%% @todo A fun of arity 2 would receive the last dispatcher and the
+%% current request (requires modifying next/1 and the spewf appmod).
+%%
+%% @todo The fun should be able to return a tuple (or maybe an improper
+%% list, like a generator?) with the nodename and a new fun to replace
+%% itself.
 append_to_dispatcher_list(Mod, Item) ->
    gen_server:call(?SERVER, {append_to_dispatcher_list, Mod, Item}).
 
+%% @spec dispatcher_list(Module::atom(), Dispatcher) ->
+%%    ok
+%%    Dispatcher = Node + function()
+%%    Node = atom()
+%% @doc Removes the entry from the dispatcher list for the given
+%% subapp. Note: this always succeeds, even if the item was not
+%% in the list. For funs to compare equal, they need to be defined
+%% in the same context and consist of the same forms.
 remove_from_dispatcher_list(Mod, Item) ->
    gen_server:call(?SERVER, {remove_from_dispatcher_list, Mod, Item}).
 
@@ -64,33 +135,11 @@ info() ->
 info(Mod) ->
    gen_server:call(?SERVER, {info, Mod}).
 
-%%====================================================================
-%% Server functions
-%%====================================================================
-
-%%--------------------------------------------------------------------
-%% Function: init/1
-%% Description: Initiates the server
-%% Returns: {ok, State}          |
-%%          {ok, State, Timeout} |
-%%          ignore               |
-%%          {stop, Reason}
-%%--------------------------------------------------------------------
 init([]) ->
    %% TODO: configure
    %% spewf is the hardcoded default--all local sessions
    {ok, dict:store(spewf, #sessionspec{next = [local], done = []}, dict:new())}.
 
-%%--------------------------------------------------------------------
-%% Function: handle_call/3
-%% Description: Handling call messages
-%% Returns: {reply, Reply, State}          |
-%%          {reply, Reply, State, Timeout} |
-%%          {noreply, State}               |
-%%          {noreply, State, Timeout}      |
-%%          {stop, Reason, Reply, State}   | (terminate/2 is called)
-%%          {stop, Reason, State}            (terminate/2 is called)
-%%--------------------------------------------------------------------
 handle_call(info, _From, State) ->
    {reply, State, State};
 handle_call({info, Mod}, _From, State) ->
@@ -126,41 +175,17 @@ handle_call({next, Mod}, _From, State) ->
 handle_call(Request, From, State) ->
    {reply, {what_is_that, Request, From, State}, State}.
 
-%%--------------------------------------------------------------------
-%% Function: handle_cast/2
-%% Description: Handling cast messages
-%% Returns: {noreply, State}          |
-%%          {noreply, State, Timeout} |
-%%          {stop, Reason, State}            (terminate/2 is called)
-%%--------------------------------------------------------------------
 handle_cast(stop, State) ->
     {stop, normal, State};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-%%--------------------------------------------------------------------
-%% Function: handle_info/2
-%% Description: Handling all non call/cast messages
-%% Returns: {noreply, State}          |
-%%          {noreply, State, Timeout} |
-%%          {stop, Reason, State}            (terminate/2 is called)
-%%--------------------------------------------------------------------
 handle_info(_Info, State) ->
     {noreply, State}.
 
-%%--------------------------------------------------------------------
-%% Function: terminate/2
-%% Description: Shutdown the server
-%% Returns: any (ignored by gen_server)
-%%--------------------------------------------------------------------
 terminate(_Reason, _State) ->
     ok.
 
-%%--------------------------------------------------------------------
-%% Func: code_change/3
-%% Purpose: Convert process state when code is changed
-%% Returns: {ok, NewState}
-%%--------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
