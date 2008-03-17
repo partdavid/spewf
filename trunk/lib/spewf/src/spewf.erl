@@ -1,10 +1,39 @@
+%%
+%% Copyright 2008 partdavid at gmail.com
+%%
+%% This file is part of SPEWF.
+%%
+%% SPEWF is free software: you can redistribute it and/or modify it under the
+%% terms of the GNU Lesser General Public License as published by the Free
+%% Software Foundation, either version 3 of the License, or (at your option)
+%% any later version.
+%%
+%% SPEWF is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+%% FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+%% more details.
+%%
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
+%%
 -module(spewf).
--export([out/1]).
--compile(export_all).
+-export([out/1, start/0]).
+%% @author partdavid@gmail.com
+%% @doc This is a yaws appmod which provides the glue between yaws and
+%% the spewf application. It handles yaws requests, delegating them to
+%% new or existing spewf sessions as appropriate.
 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
+%% @spec start() -> ok + {error, Reason}
+%%    Reason = term()
+%% @doc Starts the spewf application.
+start() ->
+   spewf_app:start().
+
+%% I might want to change this someday. Maybe spewf should read an subapp
+%% file of record definitions and send records to the sessions.
 val(L, K) ->
 	 lists:keysearch(K, 1, L).
 
@@ -35,14 +64,13 @@ make_mod(Data) ->
 %% The beginnings of the "spewf template language", whatever that will
 %% look like, are here. For one thing, would like to be more forgiving
 %% about term types.
-spewf2ehtml({spewf, What}) ->
+spewf2ehtml({spewf, Options, What}) ->
    {ehtml, What}.
 
 hidden_formfield(Spid) ->
    {input, [{type, "hidden"}, {name, "spewfsid"},
             {value, Spid}]}.
 
-%% TODO: form params
 %% TODO: cookies
 add_session(A, Spid, {ehtml, Terms}) ->
    {ehtml, add_session(A, Spid, Terms)};
@@ -93,6 +121,10 @@ urlsafe(L) ->
                  (C) -> C
              end, string:strip(L, right, $=)).
 
+%% @spec out(Request) -> {ehtml, [term()]}
+%%    Request = #arg{}
+%% @doc Handles the yaws request given, returning an ehtml Erlang term
+%% structure.
 out(A) ->
    R = [ {list_to_atom(K), V} || {K, V} <- yaws_api:parse_query(A) ],
    %% TODO: add regular CGI type information to request, verify

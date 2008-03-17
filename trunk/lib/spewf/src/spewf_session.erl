@@ -1,8 +1,26 @@
+%%
+%% Copyright 2008 partdavid at gmail.com
+%%
+%% This file is part of SPEWF.
+%%
+%% SPEWF is free software: you can redistribute it and/or modify it under the
+%% terms of the GNU Lesser General Public License as published by the Free
+%% Software Foundation, either version 3 of the License, or (at your option)
+%% any later version.
+%%
+%% SPEWF is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+%% FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+%% more details.
+%%
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
+%%
+-module(spewf_session).
 %% @doc This is the session module. This is the gen_server that the dispatcher
 %% communicates with. The gen_server behavior is not quite generic here,
 %% the session replies directly back to the calling process rather than
 %% the dispatcher.
--module(spewf_session).
 -behaviour(gen_server).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -11,6 +29,7 @@
                   module,
                   state}).
 
+%% API
 -export([start_link/2,
          start_link/4,
          stop/1]).
@@ -33,12 +52,13 @@ behaviour_info(callbacks) ->
 behaviour_info(_) ->
    undefined.
 
-%% @doc Starts the server.
-%% @spec start_link() -> {ok, pid()} | {error, Reason}
-%% @end
+%% @spec start_link(Module::atom(), sid()) -> {ok, pid()} + {error, Reason}
+%% @doc Starts a session.
 start_link(Mod, Sid) ->
    gen_server:start_link(?MODULE, [Mod, Sid], []).
 
+%% @spec start_link(Module::atom(), From::pid(), sid(), request()) ->
+%% @doc Starts a session, with an initial request.
 start_link(Mod, From, Sid, Req) ->
    gen_server:start_link(?MODULE, [Mod, From, Sid, Req], []).
 
@@ -92,12 +112,37 @@ stop(Pid) ->
 request(Pid, Req) ->
    request(Pid, self(), Req).
    
-%% @doc Really only called from dispatcher, that's why explicit From
+%% @spec request(Session::pid(), From::pid(), request()) -> ok
+%% @doc Intended to be called from the spewf_dispatcher. Makes a
+%% request of the session in the given pid. The session arranges
+%% to reply directly to the From pid.
 request(Pid, From, Req) ->
    gen_server:cast(Pid, {request, From, Req}).
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
+
+%% <hr width="80%" style="color: gray" />
+
+%% @spec Module:init(Args) -> {ok, State} + {ok, State, Timeout} + Error
+%%    Args = []
+%%    State = any()
+%%    Timeout = integer()
+%% @doc A callback module using the spewf_session behavior implements
+%% this callback to perform needed initialization. State and Timeout
+%% in the return value have the same meaning as they do for gen_server.
+%% @end
+%% @spec Module:handle_request(request(), State) ->
+%%    {Reply, NewState} + {Reply, NewState, Timeout}
+%%    State = any()
+%%    NewState = any()
+%%    Reply = any()
+%%    Timeout = integer()
+%% @doc A callback module using the spewf_session behavior implements
+%% this callback to handle a request. The meaning of State, NewState
+%% and Timeout are the same as they are for a gen_server. Note that
+%% a spewf_session does not have the option of not providing a reply.
+%% @end
 
 reap_answer(Sid) ->
    receive

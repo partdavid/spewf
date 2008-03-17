@@ -1,5 +1,27 @@
-%% @doc Test module for spewf, merely echoes
+%%
+%% Copyright 2008 partdavid at gmail.com
+%%
+%% This file is part of SPEWF.
+%%
+%% SPEWF is free software: you can redistribute it and/or modify it under the
+%% terms of the GNU Lesser General Public License as published by the Free
+%% Software Foundation, either version 3 of the License, or (at your option)
+%% any later version.
+%%
+%% SPEWF is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+%% FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
+%% more details.
+%%
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
+%%
 -module(webecho).
+%% @doc Test module for spewf; mainly echoes the request and provides
+%% a field for form input. This is essentially an implementation of
+%% the [http://www.paulgraham.com/arcchallenge.html arc challenge] plus
+%% additional information (including all the fields in the request).
+
 -behaviour(spewf_session).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -12,6 +34,11 @@
 init([]) ->
    {ok, #state{said="You said nothing yet"}}.
 
+%% @spec handle_request(Request, State) -> {Reply, NewState}
+%%    State = #state{}
+%%    NewState = #state{}
+%%    Request = request()
+%% @doc The spewf_session callback for handling the reply.
 handle_request(R, S) ->
    Said = case lists:keysearch(said, 1, R) of
              {value, {said, Value}} -> Value;
