@@ -1,3 +1,44 @@
+%% @author partdavid@gmail.com
+%% @doc This is the session module. This is the gen_server that the dispatcher
+%% communicates with. The gen_server behavior is not quite generic here,
+%% the session replies directly back to the calling process rather than
+%% the dispatcher.
+%%
+%% <hr width="80%" style="color: gray" />
+%% <h3>CALLBACK FUNCTIONS</h3>
+
+%% <span class="bold_code">Module:init(Args) -> {ok, State} | {ok, State, Timeout} | Error
+%% <div class="REFBODY"><p>Types:</p>
+%%    <div class="REFTYPES"><p>
+%%    <span class="bold_code">Args = []</span><br/>
+%%    <span class="bold_code">State = any()</span><br/>
+%%    <span class="bold_code">Timeout = integer()</span><br/>
+%% </p></div></div>
+%% <div class="REFBODY"><p>
+%% A callback module using the spewf_session behavior implements
+%% this callback to perform needed initialization. State and Timeout
+%% in the return value have the same meaning as they do for gen_server.
+%% </p></div>
+%%
+%% <span class="bold_code">Module:handle_request(Request, State) ->
+%%    {Reply, NewState} + {Reply, NewState, Timeout}</span>
+%% <div class="REFBODY">
+%% <div class="REFTYPES"><p>
+%%    <span class="bold_code">Request = request()</span><br/>
+%%    <span class="bold_code">State = any()</span><br/>
+%%    <span class="bold_code">NewState = any()</span><br/>
+%%    <span class="bold_code">Reply = any()</span><br/>
+%%    <span class="bold_code">Timeout = integer()</span><br/>
+%% <p></div></div>
+%% <div class="REFBODY"><p>
+%% A callback module using the spewf_session behavior implements
+%% this callback to handle a request. The meaning of State, NewState
+%% and Timeout are the same as they are for a gen_server. Note that
+%% a spewf_session does not have the option of not providing a reply.
+%% </p></div>
+%%
+%% <hr style="color: gray" width="80%"/>
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,10 +58,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf_session).
-%% @doc This is the session module. This is the gen_server that the dispatcher
-%% communicates with. The gen_server behavior is not quite generic here,
-%% the session replies directly back to the calling process rather than
-%% the dispatcher.
 -behaviour(gen_server).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -58,6 +95,8 @@ start_link(Mod, Sid) ->
    gen_server:start_link(?MODULE, [Mod, Sid], []).
 
 %% @spec start_link(Module::atom(), From::pid(), sid(), request()) ->
+%%    {ok, pid()} + {error, Reason}
+%%    Reason = term()
 %% @doc Starts a session, with an initial request.
 start_link(Mod, From, Sid, Req) ->
    gen_server:start_link(?MODULE, [Mod, From, Sid, Req], []).
@@ -121,28 +160,6 @@ request(Pid, From, Req) ->
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
-
-%% <hr width="80%" style="color: gray" />
-
-%% @spec Module:init(Args) -> {ok, State} + {ok, State, Timeout} + Error
-%%    Args = []
-%%    State = any()
-%%    Timeout = integer()
-%% @doc A callback module using the spewf_session behavior implements
-%% this callback to perform needed initialization. State and Timeout
-%% in the return value have the same meaning as they do for gen_server.
-%% @end
-%% @spec Module:handle_request(request(), State) ->
-%%    {Reply, NewState} + {Reply, NewState, Timeout}
-%%    State = any()
-%%    NewState = any()
-%%    Reply = any()
-%%    Timeout = integer()
-%% @doc A callback module using the spewf_session behavior implements
-%% this callback to handle a request. The meaning of State, NewState
-%% and Timeout are the same as they are for a gen_server. Note that
-%% a spewf_session does not have the option of not providing a reply.
-%% @end
 
 reap_answer(Sid) ->
    receive

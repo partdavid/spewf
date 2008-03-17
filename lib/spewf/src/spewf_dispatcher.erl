@@ -1,3 +1,9 @@
+%% @author partdavid@gmail.com
+%% @doc This server is the dispatcher. It receives requests for existing
+%% sessions, which it looks up in its table and half-proxies. It receives
+%% requests for new sessions, for which it generates a session Id and
+%% tells its supervisor to start up, passing it the initial request.
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,10 +23,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf_dispatcher).
-%% @doc This server is the dispatcher. It receives requests for existing
-%% sessions, which it looks up in its table and half-proxies. It receives
-%% requests for new sessions, for which it generates a session Id and
-%% tells its supervisor to start up, passing it the initial request.
 
 -behaviour(gen_server).
 

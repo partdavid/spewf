@@ -1,3 +1,9 @@
+%% @author partdavid@gmail.com
+%% @copyright 2008 partdavid at gmail.com
+%% @doc This is a yaws appmod which provides the glue between yaws and
+%% the spewf application. It handles yaws requests, delegating them to
+%% new or existing spewf sessions as appropriate.
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -18,10 +24,6 @@
 %%
 -module(spewf).
 -export([out/1, start/0]).
-%% @author partdavid@gmail.com
-%% @doc This is a yaws appmod which provides the glue between yaws and
-%% the spewf application. It handles yaws requests, delegating them to
-%% new or existing spewf sessions as appropriate.
 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("eunit/include/eunit.hrl").

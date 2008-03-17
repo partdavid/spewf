@@ -1,3 +1,6 @@
+%% @author partdavid@gmail.com
+%% @doc Application callback module for SPEWF.
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,8 +20,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf_app).
-%% @author partdavid@gmail.com
-%% @doc Application callback module for SPEWF.
 
 -behaviour(application).
 

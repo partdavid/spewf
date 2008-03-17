@@ -1,3 +1,8 @@
+%% @author partdavid@gmail.com
+%% @doc This is the spewf session manager supervisor. All it does is
+%% supervise the gen_server (spewf_server) that determines where the
+%% next dispatcher is that should be asked for a new session. -pd
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,9 +22,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf_server_sup).
-%% @doc This is the spewf session manager supervisor. All it does is
-%% supervise the gen_server (spewf_server) that determines where the
-%% next dispatcher is that should be asked for a new session. -pd
 
 -behaviour(supervisor).
 

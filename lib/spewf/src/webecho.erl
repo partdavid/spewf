@@ -1,3 +1,9 @@
+%% @author partdavid@gmail.com
+%% @doc Test module for spewf; mainly echoes the request and provides
+%% a field for form input. This is essentially an implementation of
+%% the [http://www.paulgraham.com/arcchallenge.html arc challenge] plus
+%% additional information (including all the fields in the request).
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,10 +23,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(webecho).
-%% @doc Test module for spewf; mainly echoes the request and provides
-%% a field for form input. This is essentially an implementation of
-%% the [http://www.paulgraham.com/arcchallenge.html arc challenge] plus
-%% additional information (including all the fields in the request).
 
 -behaviour(spewf_session).
 
