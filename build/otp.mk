@@ -51,7 +51,7 @@ ERL_TOP=/opt/OTP_SRC
 TARGET=i686-pc-linux-gnu
 endif
 
-ERLANG_OTP=/usr/local/erlang/otp
+ERLANG_OTP=/usr/local/lib/erlang
 VAR_OTP=/var/otp
 
 
