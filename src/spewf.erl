@@ -67,8 +67,9 @@ sid2pid(<<IVec:16/binary, Sid/binary>>) ->
 
 sidkey() ->
    case application:get_env(spewf, sidkey) of
-      {ok, Key} -> Key
-      _ -> base64:decode(?sidkey);
+      {ok, Key} when is_binary(Key) -> Key;
+      {ok, Key} when is_list(Key) -> base64:decode(Key);
+      _ -> base64:decode(?sidkey)
    end.
 
 pid2sid(Pid) ->
