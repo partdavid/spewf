@@ -1,3 +1,11 @@
+%% @author partdavid@gmail.com
+%% @doc This is the spewf dispatcher supervisor. It supervises this local
+%% dispatcher as well as the sessions the dispatcher creates.
+%% @end
+%%
+%% @type request() = [{Key::atom(), Value::term()}].
+%% @type sid() = {Node::atom(), Id::reference()}.
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,12 +25,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf_dispatch_sup).
-%% @doc This is the spewf dispatcher supervisor. It supervises this local
-%% dispatcher as well as the sessions the dispatcher creates.
-%%
-%% @type request() = [{Key::atom(), Value::term()}].
-%% @type sid() = {Node::atom(), Id::reference()}.
-%% % move types into overview doc
 
 -behaviour(supervisor).
 

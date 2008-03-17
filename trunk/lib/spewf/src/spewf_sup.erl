@@ -1,3 +1,9 @@
+%% @author partdavid@gmail.com
+%% @doc This is the spewf master supervisor. It supervises the session
+%% manager tree (which determines at what dispatcher to start new sessions)
+%% and the dispatcher tree (which dispatches every request to the
+%% appropriate session).
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,10 +23,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf_sup).
-%% @doc This is the spewf master supervisor. It supervises the session
-%% manager tree (which determines at what dispatcher to start new sessions)
-%% and the dispatcher tree (which dispatches every request to the
-%% appropriate session).
 
 -behaviour(supervisor).
 

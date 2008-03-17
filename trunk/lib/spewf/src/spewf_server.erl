@@ -1,3 +1,8 @@
+%% @author partdavid@gmail.com
+%% @doc This server is the "session manager". It handles the round-robin
+%% handing out of dispatcher specifications--that is, where the next
+%% new session should be started.
+%% @end
 %%
 %% Copyright 2008 partdavid at gmail.com
 %%
@@ -17,9 +22,6 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf_server).
-%% @doc This server is the "session manager". It handles the round-robin
-%% handing out of session specifications, which are incomplete child
-%% specifications. In its simplest form, 
 -behaviour(gen_server).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -118,7 +120,7 @@ unregister_subapp(Mod) ->
 append_to_dispatcher_list(Mod, Item) ->
    gen_server:call(?SERVER, {append_to_dispatcher_list, Mod, Item}).
 
-%% @spec dispatcher_list(Module::atom(), Dispatcher) ->
+%% @spec remove_from_dispatcher_list(Module::atom(), Dispatcher) ->
 %%    ok
 %%    Dispatcher = Node + function()
 %%    Node = atom()
