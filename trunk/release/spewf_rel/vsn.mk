@@ -1,1 +1,1 @@
-REL_VSN=1.0
+REL_VSN=0.5
