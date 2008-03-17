@@ -1,0 +1,8 @@
+@doc The spewf application is a yaws-based web framework which enables
+a programmer to write a web application using a simple event-based
+model where he or she can assume that they are communicating with
+only one client. The programmer implements a callback module complying
+with the {@link spewf_session} behavior, and the web communication,
+request multiplexing, and HTML generation associated with maintaining
+the session are taken care of. See the {@link webecho} module
+for an example.
