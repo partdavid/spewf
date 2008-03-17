@@ -16,7 +16,6 @@
     spewf_server,
     spewf_dispatch_sup,
     spewf_dispatcher,
-    spewf_build,
     spewf,
     webecho
    ]},
