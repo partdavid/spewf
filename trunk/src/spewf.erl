@@ -67,8 +67,8 @@ sid2pid(<<IVec:16/binary, Sid/binary>>) ->
 
 sidkey() ->
    case application:get_env(spewf, sidkey) of
-      undefined -> base64:decode(?sidkey);
-      Key -> Key
+      {ok, Key} -> Key
+      _ -> base64:decode(?sidkey);
    end.
 
 pid2sid(Pid) ->
@@ -99,19 +99,33 @@ out(A) ->
    %% TODO: add header and other instructions to spewf response style
    %% TODO: heck, add spewf response style
    Mod = make_mod(A#arg.appmoddata),
-   Answer = 
-      case val(R, spewfsid) of
-         {value, {spewfsid, V}} ->
-            Spid = sid2pid(V),
-            do_alive_request(Mod, Spid, R);
-         false ->
-            do_start_request(Mod, R)
-      end,
-   case Answer of
-      {answer, NewSpid, Response} ->
-         add_session(A, pid2sid(NewSpid), Response);
-      Error ->
-         Error
+   case is_subapp(Mod) of
+      true ->
+         Answer = 
+            case val(R, spewfsid) of
+               {value, {spewfsid, V}} ->
+                  Spid = sid2pid(V),
+                  do_alive_request(Mod, Spid, R);
+               false ->
+                  do_start_request(Mod, R)
+            end,
+         case Answer of
+            {answer, NewSpid, Response} ->
+               add_session(A, pid2sid(NewSpid), Response);
+            Error ->
+               Error
+         end;
+      _ ->
+         %% TODO: This should really just be a 404 Not Found
+         internal_error({not_subapp, Mod})
+   end.
+
+is_subapp(Mod) ->
+   case application:get_env(spewf, subapps) of
+      {ok, Subapps} when is_list(Subapps) ->
+         lists:member(Mod, Subapps);
+      _ ->
+         Mod == webecho
    end.
 
 do_alive_request(Mod, Spid, R) ->
