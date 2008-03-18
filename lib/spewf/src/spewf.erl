@@ -124,12 +124,25 @@ urlsafe(L) ->
                  (C) -> C
              end, string:strip(L, right, $=)).
 
+%% TODO: There's a DoS opportunity here with the dynamic
+%% atom creation.
+make_req(A) ->
+   Get = [ {list_to_atom(K), V} || {K, V} <- yaws_api:parse_query(A) ],
+   Req = A#arg.req,
+   Post = case Req#http_request.method of
+             'POST' ->
+                [ {list_to_atom(K), V} || {K, V} <- yaws_api:parse_post(A) ];
+             _ ->
+                []
+          end,
+   [{yaws_arg, A}, {http_request, Req} |Get] ++ Post.
+
 %% @spec out(Request) -> {ehtml, [term()]}
 %%    Request = #arg{}
 %% @doc Handles the yaws request given, returning an ehtml Erlang term
 %% structure.
 out(A) ->
-   R = [ {list_to_atom(K), V} || {K, V} <- yaws_api:parse_query(A) ],
+   R = make_req(A),
    %% TODO: add regular CGI type information to request, verify
    %%       POST params, reap session information from cookies
    %% TODO: add header and other instructions to spewf response style

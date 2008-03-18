@@ -49,7 +49,7 @@ handle_request(R, S) ->
    Reply = {spewf, [], [{h2, [], "WEBECHO Application"},
                     {p, [], ["Before: ", S#state.said]},
                     {p, [], ["This time: ", Said]},
-                    {form, [{method, get}],
+                    {form, [{method, post}],
                      [{input, [{type, "text"}, {name, "said"}, {size, 50}], []},
                       {input, [{type, "submit"}], []}]},
                     show_req(R)
@@ -66,5 +66,5 @@ show_req([{K, V}|R], A) ->
    show_req(R, [{tr, [],
                  [
                   {td, [{align, "left"}], [{b, [], Ks}, ":"]},
-                  {td, [{align, "left"}], V}
+                  {td, [{align, "left"}], io_lib:format("~p", [V])}
                  ]}|A]).
