@@ -2,7 +2,7 @@
 {application, %APP_NAME%,
  [
   % A quick description of the application.
-  {description, "An Erlang Application."},
+  {description, "Basic web posting board"},
 
   % The version of the applicaton
   {vsn, "%VSN%"},
@@ -21,7 +21,7 @@
   % your release handle this. 
   {applications,
    [
-    kernel, 
+    kernel,
     stdlib
    ]},
 
@@ -35,7 +35,7 @@
   {env, []},
 
   % The Module and Args used to start this application.
-  {mod, {%APP_NAME%, []}}
+  {mod, {bd_app, []}}
  ]
 }.
 

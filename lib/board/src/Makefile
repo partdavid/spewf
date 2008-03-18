@@ -51,7 +51,7 @@ WEB_TARGET=/var/yaws/www/$(APP_NAME)
 # FLAGS
 # ----------------------------------------------------
 
-ERL_FLAGS +=
+ERL_FLAGS += -pa ../../spewf/ebin
 ERL_COMPILE_FLAGS += -I../include -I../../fslib/include -I../../system_status/include 
 
 # ----------------------------------------------------
@@ -92,21 +92,29 @@ $(APP_TARGET): $(APP_SRC) ../vsn.mk $(BEAMS)
 $(APPUP_TARGET): $(APPUP_SRC) ../vsn.mk
 	sed -e 's;%VSN%;$(VSN);' $< > $@
 
-$(WEB_TARGET): ../markup/* 
+$(WEB_TARGET): ../markup/*
 	rm -rf $(WEB_TARGET) 
 	mkdir $(WEB_TARGET) 
 	cp -r ../markup/ $(WEB_TARGET)
-	cp -r ../skins/ $(WEB_TARGET)
 
 # ----------------------------------------------------
 # Install Target
 # ---------------------------------------------------- 
 
-install: all $(WEB_TARGET)
-#	$(INSTALL_DIR) $(INSTALL_DST)/src
-#	$(INSTALL_DATA) $(ERL_FILES) $(INSTALL_DST)/src
-#	$(INSTALL_DATA) $(INTERNAL_HRL_FILES) $(INSTALL_DST)/src
-#	$(INSTALL_DIR) $(INSTALL_DST)/include
-#	$(INSTALL_DATA) $(HRL_FILES) $(INSTALL_DST)/include
-#	$(INSTALL_DIR) $(INSTALL_DST)/ebin
-#	$(INSTALL_DATA) $(TARGET_FILES) $(INSTALL_DST)/ebin
+$(INSTALL_DST)/src:
+	mkdir -p $(INSTALL_DST)/src
+
+$(INSTALL_DST)/priv:
+	mkdir -p $(INSTALL_DST)/markup
+
+$(INSTALL_DST)/ebin:
+	mkdir -p $(INSTALL_DST)/ebin
+
+$(INSTALL_DST)/doc:
+	mkdir -p $(INSTALL_DST)/doc
+
+install: all $(INSTALL_DST)/src $(INSTALL_DST)/ebin $(INSTALL_DST)/doc $(INSTALL_DST)/priv
+	cp $(ERL_FILES) $(INSTALL_DST)/src
+	cp $(TARGET_FILES) $(INSTALL_DST)/ebin
+	cp ../doc/* $(INSTALL_DST)/doc
+	cp -R ../priv/* $(INSTALL_DST)/priv

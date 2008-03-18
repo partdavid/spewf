@@ -1,63 +1,53 @@
-%%%-------------------------------------------------------------------
-%%% @doc  
-%%% @end
-%%%-------------------------------------------------------------------
+%% @author partdavid@gmail.com
+%% @doc Lightweight web posting board application, to demonstrate
+%% SPEWF.
+%% @end
+%%
+%% Copyright 2008 partdavid at gmail.com
+%%
 -module(board).
 
--behaviour(application).
-%%--------------------------------------------------------------------
-%% Include files
-%%--------------------------------------------------------------------
--include("board.hrl").
+-behaviour(spewf_session).
 
-%%--------------------------------------------------------------------
-%% External exports
-%%--------------------------------------------------------------------
--export([
-	 start/2,
-	 shutdown/0,
-	 stop/1
-	 ]).
+-include_lib("eunit/include/eunit.hrl").
 
-%%--------------------------------------------------------------------
-%% Macros
-%%--------------------------------------------------------------------
+-export([init/1,
+         handle_request/2]).
 
-%%--------------------------------------------------------------------
-%% Records
-%%--------------------------------------------------------------------
+-record(state, {said = ""}).
 
-%%====================================================================
-%% External functions
-%%====================================================================
-%%--------------------------------------------------------------------
-%% @doc The starting point for an erlang application.
-%% @spec start(Type, StartArgs) -> {ok, Pid} | {ok, Pid, State} | {error, Reason}
-%% @end
-%%--------------------------------------------------------------------
-start(Type, StartArgs) ->
-    case bd_sup:start_link(StartArgs) of
-	{ok, Pid} -> 
-	    {ok, Pid};
-	Error ->
-	    Error
-    end.
+init([]) ->
+   {ok, #state{said="You said nothing yet"}}.
 
-%%--------------------------------------------------------------------
-%% @doc Called to shudown the board application.
-%% @spec shutdown() -> ok 
-%% @end
-%%--------------------------------------------------------------------
-shutdown() ->
-    application:stop(board).
+%% @spec handle_request(Request, State) -> {Reply, NewState}
+%%    State = #state{}
+%%    NewState = #state{}
+%%    Request = request()
+%% @doc The spewf_session callback for handling the reply.
+handle_request(R, S) ->
+   Said = case lists:keysearch(said, 1, R) of
+             {value, {said, Value}} -> Value;
+             false -> "You said nothing"
+          end,
+   Reply = {ehtml, [{h2, [], "BOARD Application"},
+                    {p, [], ["Before: ", S#state.said]},
+                    {p, [], ["This time: ", Said]},
+                    {form, [{method, get}],
+                     [{input, [{type, "text"}, {name, "said"}, {size, 50}], []},
+                      {input, [{type, "submit"}], []}]},
+                    show_req(R)
+                   ]},
+   {Reply, #state{said = Said}}.
 
-%%====================================================================
-%% Internal functions
-%%====================================================================
+show_req(R) ->
+   show_req(R, []).
 
-%%--------------------------------------------------------------------
-%% Called upon the termintion of an application.
-%%--------------------------------------------------------------------
-stop(State) ->
-    ok.
-
+show_req([], A) ->
+   {table, [{border, none}], lists:reverse(A)};
+show_req([{K, V}|R], A) ->
+   Ks = atom_to_list(K),
+   show_req(R, [{tr, [],
+                 [
+                  {td, [{align, "left"}], [{b, [], Ks}, ":"]},
+                  {td, [{align, "left"}], io_lib:format("~p", [V])}
+                 ]}|A]).
