@@ -7,7 +7,7 @@ all docs install:
 	done
 
 clean:
-	rm -f *.access *.log
+	rm -f *.access *.log erl_crash.dump
 	for dir in $(MODULES); do \
 		(cd $$dir; ${MAKE} $@); \
 	done
