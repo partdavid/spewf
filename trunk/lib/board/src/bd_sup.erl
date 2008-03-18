@@ -1,74 +1,38 @@
-%%%-------------------------------------------------------------------
-%%% @doc  
-%%% @end
-%%%-------------------------------------------------------------------
 -module(bd_sup).
 
 -behaviour(supervisor).
-%%--------------------------------------------------------------------
-%% Include files
-%%--------------------------------------------------------------------
 
-%%--------------------------------------------------------------------
-%% External exports
-%%--------------------------------------------------------------------
 -export([
-	 start_link/1
+         start_link/1
         ]).
 
-%%--------------------------------------------------------------------
-%% Internal exports
-%%--------------------------------------------------------------------
 -export([
-	 init/1
+         init/1
         ]).
 
-%%--------------------------------------------------------------------
-%% Macros
-%%--------------------------------------------------------------------
 -define(SERVER, ?MODULE).
 
-%%--------------------------------------------------------------------
-%% Records
-%%--------------------------------------------------------------------
-
-%%====================================================================
-%% External functions
-%%====================================================================
-%%--------------------------------------------------------------------
-%% @doc Starts the supervisor.
-%% @spec start_link(StartArgs) -> {ok, pid()} | Error
-%% @end
-%%--------------------------------------------------------------------
-start_link(StartArgs) ->
+%% @spec start_link(StartArgs) -> {ok, pid()} + {error, Reason}
+%% @doc Start the board supervisor.
+start_link(_StartArgs) ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
-%%====================================================================
-%% Server functions
-%%====================================================================
-%%--------------------------------------------------------------------
-%% Func: init/1
-%% Returns: {ok,  {SupFlags,  [ChildSpec]}} |
-%%          ignore                          |
-%%          {error, Reason}   
-%%--------------------------------------------------------------------
+%% @spec init(Args) -> {ok, pid()} + {error, Reason}
+%% @doc Initialize the supervisor.
 init([]) ->
-    RestartStrategy    = one_for_one,
-    MaxRestarts        = 1000,
-    MaxTimeBetRestarts = 3600,
-    
-    SupFlags = {RestartStrategy, MaxRestarts, MaxTimeBetRestarts},
-    
-    ChildSpecs =
-	[
-	 {bd_server,
-	  {bd_server, start_link, []},
-	  permanent,
-	  1000,
-	  worker,
-	  [bd_server]}
-	 ],
+   RestartStrategy    = one_for_one,
+   MaxRestarts        = 1000,
+   MaxTimeBetRestarts = 3600,
+   
+   SupFlags = {RestartStrategy, MaxRestarts, MaxTimeBetRestarts},
+   
+   ChildSpecs =
+      [
+       {bd_server,
+        {bd_server, start_link, []},
+        permanent,
+        1000,
+        worker,
+        [bd_server]}
+      ],
     {ok,{SupFlags, ChildSpecs}}.
-%%====================================================================
-%% Internal functions
-%%====================================================================
