@@ -63,15 +63,16 @@ make_mod(Data) ->
 	 [Mod|_] = string:tokens(Data, "/"),
 	 list_to_atom(Mod).
 
-%% The beginnings of the "spewf template language", whatever that will
-%% look like, are here. For one thing, would like to be more forgiving
-%% about term types.
-spewf2ehtml({spewf, Options, What}) ->
-   {ehtml, What}.
-
 hidden_formfield(Spid) ->
    {input, [{type, "hidden"}, {name, "spewfsid"},
             {value, Spid}]}.
+
+process_answer(A, Mod, Spid, {ehtml, Terms}) ->
+   add_session(A, Spid, {ehtml, Terms});
+process_answer(A, Mod, Spid, {html, Content}) ->
+   {html, Content};
+process_answer(A, Mod, Spid, {spewf, Options, Content}) ->
+   spewf_lang:trans({spewf, [{subapp, Mod}, {spewfsid, Spid}|Options], Content}).
 
 %% TODO: cookies
 add_session(A, Spid, {ehtml, Terms}) ->
@@ -146,7 +147,7 @@ out(A) ->
             end,
          case Answer of
             {answer, NewSpid, Response} ->
-               add_session(A, pid2sid(NewSpid), Response);
+               process_answer(A, Mod, pid2sid(NewSpid), Response);
             Error ->
                Error
          end;

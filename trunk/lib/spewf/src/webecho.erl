@@ -46,7 +46,7 @@ handle_request(R, S) ->
              {value, {said, Value}} -> Value;
              false -> "You said nothing"
           end,
-   Reply = {ehtml, [{h2, [], "WEBECHO Application"},
+   Reply = {spewf, [], [{h2, [], "WEBECHO Application"},
                     {p, [], ["Before: ", S#state.said]},
                     {p, [], ["This time: ", Said]},
                     {form, [{method, get}],
