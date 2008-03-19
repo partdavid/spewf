@@ -30,8 +30,9 @@
 -export([start_link/0, start_shell/0,
          stop/0]).
 
--export([next/1, register_subapp/2, unregister_subapp/1, info/0, info/1,
-        append_to_dispatcher_list/2, remove_from_dispatcher_list/2]).
+-export([next/1, register_subapp/2,
+         unregister_subapp/1, info/0, info/1,
+         append_to_dispatcher_list/2, remove_from_dispatcher_list/2]).
 
 -export([init/1,
          handle_call/3,
@@ -86,11 +87,17 @@ register_subapp(Mod, DispatcherList) ->
 
 %% @spec unregister_subapp(Module::atom()) -> ok + {error, Reason}
 %%    Reason = term()
-%% @doc Remove the subapp from the session manager. Any further requests
-%% via {@link next/1} for the subapp will use the ``spewf'' built-in
-%% default.
+%% @doc Remove the subapp from the session manager. SPEWF will not
+%% handle further requests for this subapp.
 unregister_subapp(Mod) ->
    gen_server:call(?SERVER, {unregister_subapp, Mod}).
+
+%% @spec stop_handling_subapp(Module::atom()) -> ok
+%% @doc Actually remove the specified Module as a subapp--spewf will
+%% no longer handle requests for it, but will show the error page.
+stop_handling_subapp(Mod) ->
+   O = ordsets:from_list(application:get_env(spewf, subapps)),
+   application:set_env(spewf, subapps, ordsets:del_element(Mod, O)).
 
 %% @spec append_to_dispatcher_list(Module::atom(), Dispatcher) ->
 %%    ok + {error, Reason}
@@ -153,10 +160,27 @@ handle_call({append_to_dispatcher_list, Mod, Item}, _From, State) ->
 handle_call({unregister_subapp, spewf}, _From, State)->
    {reply, {error, cannot_unregister_default}, State};
 handle_call({unregister_subapp, Mod}, _From, State) ->
+   case application:get_env(spewf, subapps) of
+      undefined ->
+         application:set_env(spewf, subapps, []);
+      List ->
+         application:set_env(spewf,
+                             subapps,
+                             ordsets:del_element(Mod,
+                                                 ordsets:from_list(Mod)))
+   end,
    {reply, ok, dict:erase(Mod, State)};
 handle_call({register_subapp, spewf, []}, _From, State) ->
    {reply, {error, {cannot_register_empty_default, spewf}}, State};
 handle_call({register_subapp, Mod, Dlist}, _From, State) ->
+   case application:get_env(spewf, subapps) of
+      undefined ->
+         application:set_env(spewf, subapps, [Mod]);
+      List ->
+         application:set_env(spewf, subapps,
+                             ordsets:add_element(Mod,
+                                                 ordsets:from_list(List)))
+   end,
    {reply, {registered, Mod},
           dict:store(Mod, #sessionspec{next = Dlist}, State)};
 handle_call({next, Mod}, _From, State) ->
