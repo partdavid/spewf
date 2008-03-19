@@ -23,7 +23,7 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf).
--export([out/1, start/0]).
+-export([out/1, start/0, make_req/1]).
 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("eunit/include/eunit.hrl").
