@@ -1,0 +1,221 @@
+body {
+   font-family: sans-serif;
+   color: #000000;
+   /* background-color: #ffffff; */
+   background-color: #eadd9d;
+}
+
+blockquote { font-style: italic; font-size: 11pt }
+
+h3 { margin-top: 5px; border-bottom: solid 1px #893d45; }
+
+#main {
+   border: solid 1px #893d45;
+   padding-top: 0px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-bottom: 10px;
+   margin: 0px 50px 50px 200px;
+   top: 0px;
+   background-color: #f0f0f0;
+}
+
+p.mitem {
+   padding: 0px;
+   margin: 0 0 0 0;
+}
+
+p.mtitle {
+   font-weight: bold;
+   text-align: center;
+   font-size: 11pt;
+   border-bottom: solid 1px #893d45;
+   padding: 0;
+   margin: 0;
+}
+
+p.comment {
+   font-size: 10pt;
+   color: #909090;
+   font-style: italic;
+}
+
+p.charter-principle {
+   font-weight: bold;
+   /* font-family: monospace; */
+   font-size: 12pt;
+}
+
+p.charter-randr {
+   /* font-family: monospace; */
+   font-size: 12pt;
+   font-weight: normal;
+}
+
+#menu {
+   /* position: absolute; */
+   /* top: 62px; */
+   /* left: 5px; */
+   padding-top: 0px;
+   padding-right: 10px;
+   padding-left: 10px;
+   padding-bottom: 10px;
+   float: left;
+   width: 172px;
+   background-color: #f0f0f0;
+   border: solid 1px #893d45;
+   font-size: 10pt;
+
+}
+
+h1,h2 { font-size: 18pt; color: #893d45 }
+
+h1.title {
+   font-size: 26pt;
+   text-align: left;
+   font-family: serif;
+   font-style: oblique;
+   /* color: #8b4513; */
+   font-weight: bolder;
+}
+
+h2 { font-size: 16pt }
+
+h2.title {
+   font-size: 12pt;
+   text-align: right;
+   margin-right: 50px;
+}
+
+dl.people    { font-size: 12pt; margin-left: 40px }
+dl.people dd { font-size: 11pt; font-weight: bold }
+dl.people dt { font-size: 11pt; font-style: italic }
+
+hr { border: 0; color: #893d45; background-color: #893d45; width: 80%; text-align: center; height: 1px }
+
+body.narration p { text-indent: 0.3in }
+
+p.final-note { font-size: 10pt }
+
+p.turn {
+   font-size: 60%;
+   font-style: oblique;
+   text-align: right;
+   color: #8b4513;
+   border-bottom: 1px solid #893d45;
+}
+
+p.disclaimer {
+   font-size: 10pt;
+   color: #003366;
+   width: 60%;
+   text-align: center;
+   border: 1px;
+   background-color: #e0e0e0;
+}
+
+ul.navlinks {
+   padding: 0;
+   margin: 0;
+   list-style-image: url(bullet.png);
+}
+
+ul.navlinks li {
+   margin-left: 20px;
+}
+
+div.admonition-example {
+   font-size: 12pt;
+   color: #003366;
+   background-color: #e0e0e0;
+   border: solid 1pt;
+   width: 80%;
+}
+
+div.admonition-example p {
+   margin-left: 20px;
+}
+
+div.admonition-example p.first {
+   margin-left: 5px;
+   margin-top: 5px;
+   font-size: 14pt;
+   color: #e01010;
+   font-weight: bold;
+}
+
+dl.personnel { font-size: 12pt; margin-left: 40px }
+dl.personnel dt { font-size: 11pt; font-weight: bold }
+dl.personnel dd { font-size: 11pt; font-style: italic }
+
+dt { font-weight: bold }
+   
+code { font-family: monospace }
+
+table.directory {
+   margin-left: 23pt;
+   border-style: groove none;
+   font-size: 10pt;
+}
+
+table.directory th {
+   text-align: left;
+   border-bottom: solid 1px;
+   padding-right: 10px
+}
+
+table.directory td {
+   padding-right: 10px
+}
+
+table.list {
+   border: 1px solid black;
+   border-collapse: collapse;
+}
+
+table.list th { background-color: #d0d0d0; }
+
+table.list td { vertical-align: top; border: 1px solid black }
+
+table.table {
+   /* background-color: #03A363; */
+   background-color: #e0e0e0;
+   margin-left: 23pt;
+   border: solid 1pt;
+   border-spacing: 0;
+}
+
+thead table.table {
+   background-color: #d0d0d0;
+}
+
+td table.table {
+   border: solid 1pt;
+   border-top: none;
+   border-left: none;
+   border-right: solid 1pt;
+   border-bottom: solid 1pt;
+   cell-padding: 0;
+}
+
+table.footnote { font-size: 83% }
+
+pre.code { margin-left: 23pt }
+
+a:link    { color: #6a5acd; text-decoration: none }
+a:visited { color: #6a5acd; text-decoration: none }
+a:active  { color: #32cd32; text-decoration: none }
+a:hover   { color: #6a5acd; text-decoration: underline }
+
+/* The following classes can be used with any tag */
+.little { font-size: 83% }
+.indent { margin-left: 23pt }
+.footer {
+   text-align: center;
+   border-top: solid 1px #893d45;
+   border-bottom: solid 1px #893d45;
+   font-size: 9pt;
+   width: 80%;
+   margin-left: auto;
+   margin-right: auto;
+}
