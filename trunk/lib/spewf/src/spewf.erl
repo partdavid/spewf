@@ -45,19 +45,19 @@ val(L, K) ->
 %% this is a string because the preprocessor seems to choke on binaries
 %% as the value of a macro in c() or on the erlc command line. -pd
 %% -define(sidkey, "0rJnw5xro3n+q7l87lDtBg==").
--define(error_page(Err), {ehtml,
+-define(error_page(Err), {spewf, [],
                           [
                            {head, [],
-                           {title, [], "Internal error"}},
-                          {body, [],
-                           [
-                            {h2, [{color, red}], "Internal error"},
-                            {p, [], "SPEWF has encountered an internal error, "
-                             "your session could not be created. Please report"
-                             "the following error to the site administrator."},
-                            {pre, [{color, gray}, {style, "font-size: small"}],
-                             Err}
-                           ]}]}).
+                            {title, [], "Internal error"}},
+                           {body, [],
+                            [
+                             {h2, [{style, "color: red"}], "Internal error"},
+                             {p, [], "SPEWF has encountered an internal error, "
+                              "your session could not be created. Please report "
+                              "the following error to the site administrator."},
+                             {pre, [{style, "color: gray; font-size: small"}],
+                              io_lib:format("~p", [Err])}
+                            ]}]}).
 
 make_mod(Data) ->
 	 [Mod|_] = string:tokens(Data, "/"),
@@ -72,7 +72,9 @@ process_answer(A, Mod, Spid, {ehtml, Terms}) ->
 process_answer(A, Mod, Spid, {html, Content}) ->
    {html, Content};
 process_answer(A, Mod, Spid, {spewf, Options, Content}) ->
-   spewf_lang:trans({spewf, [{subapp, Mod}, {spewfsid, Spid}|Options], Content}).
+   spewf_lang:trans({spewf, [{subapp, Mod}, {spewfsid, Spid}|Options], Content});
+process_answer(_A, _Mod, _Spid, Whatever) ->
+   Whatever.
 
 %% TODO: cookies
 add_session(A, Spid, {ehtml, Terms}) ->
@@ -196,7 +198,7 @@ do_start_request(Mod, R) ->
    end.
 
 internal_error(Err) ->
-   ?error_page(Err).
+   spewf_lang:trans(?error_page(Err)).
 
 crypt_test_() ->
    Pid = self(),
