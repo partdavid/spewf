@@ -1,3 +1,6 @@
+%% @doc The "database server" for the board application. The application
+%% should use the server for database access, since the server can be
+%% localized near ram or disc copies of the data.
 -module(bd_server).
 
 -behaviour(gen_server).
@@ -24,7 +27,6 @@
 %% @spec start_link() -> {ok, pid()} + {error, Reason}
 %%    Reason = any()
 %% @doc Starts the board server.
-%% @spec start_link() -> {ok, pid()} | {error, Reason}
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
@@ -53,7 +55,3 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
-
-%%====================================================================
-%%% Internal functions
-%%====================================================================
