@@ -59,8 +59,14 @@ val(L, K) ->
                               io_lib:format("~p", [Err])}
                             ]}]}).
 
+make_mod("") ->
+   ' ';
+make_mod("/") ->
+   ' ';
+make_mod(undefined) ->
+   undefined;
 make_mod(Data) ->
-	 [Mod|_] = string:tokens(Data, "/"),
+	 Mod = hd(string:tokens(Data, "/")),
 	 list_to_atom(Mod).
 
 hidden_formfield(Spid) ->
