@@ -1,8 +1,7 @@
 %% @doc The database access library for the SPEWF board application.
 %% Database primitive operations such as create, update and read
 %% are supported, as well as convenience operations to minimize
-%% database round-trips. The intention is to use the library through
-%% server requests.
+%% database round-trips.
 %%
 %% @type guid() = {integer(), integer(), integer(), integer()}
 %%
@@ -14,7 +13,8 @@
 %% Basic database operations
 -export([new_user/1, new_post/1,
          update_user/1, update_post/1,
-         find_user/1, find_post/1]).
+         find_user/1, find_post/1,
+         find_users/1, find_posts/1]).
 
 %% Convenience operations
 -export([authenticate/2,
@@ -33,7 +33,9 @@
          fix_friends/0,
          create_tables/1,
          load_test_data/1,
-         drop_tables/0]).
+         drop_tables/0,
+         posts/0, rawposts/0,
+         users/0, rawusers/0]).
 
 -include_lib("stdlib/include/qlc.hrl").
 -include_lib("stdlib/include/ms_transform.hrl").

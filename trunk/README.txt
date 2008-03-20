@@ -45,6 +45,8 @@ configuration and implementing a **spewf_session** callback module.
 For additional information on SPEWF's design and its internals, see
 the ``lib/spewf/design.txt`` file.
 
+See also the README.txt file in the ``lib/board`` application subdirectory.
+
 License
 =======
 
