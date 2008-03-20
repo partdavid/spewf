@@ -68,7 +68,7 @@
 
 %% API
 -export([start_link/2,
-         start_link/4,
+         start_link/3,
          stop/1]).
 
 -export([request/2, request/3]).
@@ -98,8 +98,8 @@ start_link(Mod, Sid) ->
 %%    {ok, pid()} + {error, Reason}
 %%    Reason = term()
 %% @doc Starts a session, with an initial request.
-start_link(Mod, From, Sid, Req) ->
-   gen_server:start_link(?MODULE, [Mod, From, Sid, Req], []).
+start_link(Mod, From, Sid) ->
+   gen_server:start_link(?MODULE, [Mod, From, Sid], []).
 
 init([Mod, Sid]) ->
    {ok, State, Timeout} = case Mod:init([]) of
@@ -107,13 +107,11 @@ init([Mod, Sid]) ->
                                  {ok, I, T} -> {ok, I, T}
                               end,
    {ok, #session{module = Mod, state = State, sid = Sid}, Timeout};
-init([Mod, From, Sid, Req]) ->
+init([Mod, From, Sid]) ->
    case catch Mod:init([]) of
       {ok, InitState} -> 
-         request(self(), From, Req),
          {ok, #session{module = Mod, state = InitState, sid = Sid}, infinity};
       {ok, InitState, T} -> 
-         request(self(), From, Req),
          {ok, #session{module = Mod, state = InitState, sid = Sid}, T};
       Err ->
          {stop, {error_initing_callback_mod, Mod, Err}}
@@ -179,11 +177,4 @@ basic_test_() ->
     fun() ->
           ok = stop(Pid)
     end
-   ].
-
-mfsr_test_() ->
-   Sid = {node(), make_ref()},
-   {ok, _Pid} = start_link(webecho, self(), Sid, [{said, "mfsr1"}]),
-   [
-    ?_assertMatch({ehtml, _}, reap_answer(Sid))
    ].
