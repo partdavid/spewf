@@ -42,7 +42,6 @@ init([]) ->
 %%    Request = request()
 %% @doc The spewf_session callback for handling the reply.
 handle_request(R, S) ->
-   1 = R, % CRASH!
    Said = case lists:keysearch(said, 1, R) of
              {value, {said, Value}} -> Value;
              false -> "You said nothing"
