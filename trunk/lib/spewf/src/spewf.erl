@@ -23,7 +23,8 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf).
--export([out/1, start/0, make_req/1]).
+-export([out/1, start/0, make_req/1, val/2]).
+-compile(export_all).
 
 -include_lib("yaws/include/yaws_api.hrl").
 -include_lib("eunit/include/eunit.hrl").
@@ -36,8 +37,11 @@ start() ->
 
 %% I might want to change this someday. Maybe spewf should read an subapp
 %% file of record definitions and send records to the sessions.
-val(L, K) ->
-	 lists:keysearch(K, 1, L).
+val(K, L) ->
+   case lists:keysearch(K, 1, L) of
+      {value, {K, V}} -> V;
+      _ -> undefined
+   end.
 
 %% TODO: configure
 %% The "hardcoded" sidkey is set at build time--if you are testing, or
@@ -159,12 +163,11 @@ out(A) ->
    case is_subapp(Mod) of
       true ->
          Answer = 
-            case val(R, spewfsid) of
-               {value, {spewfsid, V}} ->
+            case val(spewfsid, R) of
+               undefined -> do_start_request(Mod, R);
+               V ->
                   Spid = sid2pid(V),
-                  do_alive_request(Mod, Spid, R);
-               false ->
-                  do_start_request(Mod, R)
+                  do_alive_request(Mod, Spid, R)
             end,
          case Answer of
             {answer, NewSpid, Response} ->

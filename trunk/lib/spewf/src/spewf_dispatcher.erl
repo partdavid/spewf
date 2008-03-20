@@ -68,10 +68,10 @@ handle_call(Request, From, Table) ->
 
 handle_cast({request, Mod, From, {Node, new}, Req}, Table) ->
    Ref = make_ref(),
-   {ok, Pid} = spewf_dispatch_sup:start_session(Mod, From, {Node, Ref}, Req),
+   {ok, Pid} = spewf_dispatch_sup:start_session(Mod, From, {Node, Ref}),
    link(Pid),
    ets:insert(Table, {Ref, Pid}),
-   {noreply, Table};
+   handle_cast({request, Mod, From, {Node, Ref}, Req}, Table);
 handle_cast({request, Mod, From, {Node, Ref}, Req}, Table) ->
    case ets:lookup(Table, Ref) of
       [{Ref, Pid}|_] ->

@@ -40,7 +40,7 @@
          init/1,
          start_session/1,
          start_session/2,
-         start_session/4
+         start_session/3
         ]).
 
 -define(SERVER, ?MODULE).
@@ -67,10 +67,10 @@ start_session(Id, SessionArgs) ->
                                     worker,
                                     [spewf_session]}).
 
-start_session([Mod, From, Sid, InitRequest]) ->
-   start_session(Sid, [Mod, From, Sid, InitRequest]).
+start_session([Mod, From, Sid]) ->
+   start_session(Sid, [Mod, From, Sid]).
 
-%% @spec start_session(Module, From, Sid, InitialRequest) ->
+%% @spec start_session(Module, From, Sid) ->
 %%    {ok, Pid} + {error, Reason}
 %%    Module = atom()
 %%    From = pid()
@@ -78,13 +78,13 @@ start_session([Mod, From, Sid, InitRequest]) ->
 %%    InitialRequest = request()
 %% @doc Start a transient child spewf_session process to handle the
 %% initial request.
-start_session(Mod, From, Sid, InitRequest) ->
-   start_session(Sid, [Mod, From, Sid, InitRequest]).
+start_session(Mod, From, Sid) ->
+   start_session(Sid, [Mod, From, Sid]).
 
 init([]) ->
    RestartStrategy    = one_for_one,
-   MaxRestarts        = 1000,
-   MaxTimeBetRestarts = 3600,
+   MaxRestarts        = 100,
+   MaxTimeBetRestarts = 10,
    
    SupFlags = {RestartStrategy, MaxRestarts, MaxTimeBetRestarts},
    
