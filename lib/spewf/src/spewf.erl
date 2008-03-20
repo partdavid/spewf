@@ -23,7 +23,7 @@
 %% along with SPEWF.  If not, see <http://www.gnu.org/licenses/>.
 %%
 -module(spewf).
--export([out/1, start/0, make_req/1, val/2]).
+-export([out/1, start/0, make_req/1, val/2, set_val/3]).
 -compile(export_all).
 
 -include_lib("yaws/include/yaws_api.hrl").
@@ -42,6 +42,9 @@ val(K, L) ->
       {value, {K, V}} -> V;
       _ -> undefined
    end.
+
+set_val(K, V, L) ->
+   lists:keystore(K, 1, L, {K, V}).
 
 %% TODO: configure
 %% The "hardcoded" sidkey is set at build time--if you are testing, or

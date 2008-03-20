@@ -1,0 +1,26 @@
+{user, undefined, "alice", "grits", "alice@example.com", ["charlie"], [],
+ <<"I moved to Colorado in 1993 and am now realizing it gets quite cold here.">>}.
+{user, undefined, "bob", "autofocus", "bob@grateshakes.com", [], [],
+ <<"I work for a cool company that makes sprinkle-able cheese.">>}.
+{user, undefined, "charlie", "surfing", "charlie@grateshakes.com",
+ ["alice", "bob"], [], <<"I work at Grate Shakes with Bob!">>}.
+{user, undefined, "partdavid", "common", "partdavid@gmail.com", [], [],
+ <<"Text goes here.">>}.
+{post, undefined, undefined, "partdavid", root,
+ "Welcome",
+ <<"Welcome to the SPEWF web board.">>}.
+{post, undefined, undefined, "bob", root,
+ "From Grate Shakes",
+ <<"Hi, I just wanted to say hello from everyone at Grate Shakes! Be sure to
+    get some sprinkle cheese from us!">>}.
+{new_post, undefined, undefined, "partdavid", {summary, "From Grate Shakes"},
+ "Re: From Grate Shakes",
+ <<"Well, that's just great, bob. Welcome a-board.">>}.
+{new_post, undefined, undefined, "bob", {summary, "Re: From Grate Shakes"},
+ "Re: Re: From Grate Shakes",
+ <<"Yup, and you might want to know about our new sprinkle-able muenster cheese.">>}.
+{new_post, undefined, undefined, "alice", {summary, "From Grate Shakes"},
+ "Grate Shakes is a band!",
+ <<"I'm sorry to inform you, but Grate Shakes is the name of the best
+    Elizabethan Noisecore band around. You'll have to change the name
+    of your company.">>}.

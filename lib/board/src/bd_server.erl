@@ -1,6 +1,6 @@
-%% @doc The "database server" for the board application. The application
-%% should use the server for database access, since the server can be
-%% localized near ram or disc copies of the data.
+%% @doc The board application server. Note: the application right
+%% now pretty much just does web <-> database gluing, so it doesn't
+%% make sense to put this in front of mnesia.
 -module(bd_server).
 
 -behaviour(gen_server).

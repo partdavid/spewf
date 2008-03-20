@@ -144,6 +144,16 @@ div.admonition-example p.first {
    font-weight: bold;
 }
 
+div.summary {
+	border-top: solid 1px gray;
+	margin-top: 10px
+}
+
+div.post {
+	border-top: solid 1px gray;
+	margin-top: 10px;
+}
+
 dl.personnel { font-size: 12pt; margin-left: 40px }
 dl.personnel dt { font-size: 11pt; font-weight: bold }
 dl.personnel dd { font-size: 11pt; font-style: italic }
@@ -210,6 +220,7 @@ a:hover   { color: #6a5acd; text-decoration: underline }
 /* The following classes can be used with any tag */
 .little { font-size: 83% }
 .indent { margin-left: 23pt }
+.byline { font-style: italic; font-size: 83%; color: gray; text-align: right }
 .footer {
    text-align: center;
    border-top: solid 1px #893d45;
