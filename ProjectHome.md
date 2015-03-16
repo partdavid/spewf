@@ -1,0 +1,1 @@
+A basic web framework for Erlang that uses processes to store session data and a callback module to implement a web application. Goals include "perfect" horizontal scalability and lack of synchronous bottlenecks. Uses [yaws](http://yaws.hyber.org/)' appmod facility.
